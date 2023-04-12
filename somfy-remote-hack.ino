@@ -64,26 +64,27 @@ class SomfyRemote
 
         typedef struct
         {
-          uint8_t pin;
-          uint8_t pushed_level;
-        }button_config_t;
+            uint8_t pin;
+            uint8_t pushed_level;
+        } button_config_t;
 
         typedef struct
         {
-          button_config_t up;
-          button_config_t center;
-          button_config_t down;
-          button_config_t select;
-        }button_config_set_t;
+            button_config_t up;
+            button_config_t center;
+            button_config_t down;
+            button_config_t select;
+        } button_config_set_t;
 
         typedef enum
         {
-          SHUTTERS_ID1,
-          SHUTTERS_ID2,
-          SHUTTERS_ID3,
-          SHUTTERS_ID4,
-          SHUTTERS_ALL
-        }shutters_id_t;
+            SELECT_POS_UNKNOWN = 0,
+            SELECT_POS_1,
+            SELECT_POS_2,
+            SELECT_POS_3,
+            SELECT_POS_4,
+            SELECT_POS_ALL
+        } select_position_t;
 
         SomfyRemote(button_config_set_t & buttons);
         ~SomfyRemote() { };
@@ -91,18 +92,18 @@ class SomfyRemote
         void up();
         void center();
         void down();
-        void select(shutters_id_t shutters_id);
+        void select(select_position_t select_position);
 
     private:
       
         button_config_set_t & buttons;
-        shutters_id_t current_selected_shutters;
+        // select_position_t current_selected_position;
 };
 
 SomfyRemote::SomfyRemote(button_config_set_t & buttons):
 buttons(buttons)
 {
-    current_selected_shutters = SHUTTERS_ID1;
+    // select_position_t current_selected_position = SELECT_POS_UNKNOWN;
     pinMode(buttons.up.pin, OUTPUT);
     pinMode(buttons.center.pin, OUTPUT);
     pinMode(buttons.down.pin, OUTPUT);
@@ -131,9 +132,11 @@ void SomfyRemote::center()
     digitalWrite(buttons.center.pin, buttons.center.pushed_level);
 }
 
-void SomfyRemote::select(shutters_id_t shutters_id)
-{
-
+void SomfyRemote::select(select_position_t select_position)
+{ 
+    // current_sel_pos = get_current_select_position():
+    // calculate distance to desired position
+    // move to desired selection position
 }
 
 class ShuttersEvent
@@ -146,7 +149,7 @@ class ShuttersEvent
           DAILY,
           ON_WEEKDAYS,
           MONTHLY
-        } Recurrence_t;    
+        } recurrence_t;    
 
         ShuttersEvent(/*ocrrence, date, time*/);
           //Time
@@ -156,7 +159,7 @@ class ShuttersEvent
 
     private:
 
-        Recurrence_t recurrence;
+        recurrence_t recurrence;
         //date
         //time
         uint8_t open_percentage;
@@ -169,7 +172,7 @@ class SomfyShutters
 
         typedef uint8_t open_percentage_t;
 
-        SomfyShutters(SomfyRemote & remote, SomfyRemote::shutters_id_t id, String name);
+        SomfyShutters(SomfyRemote & remote, SomfyRemote::select_position_t id, String name);
         ~SomfyShutters();
 
         void open(uint8_t open_percentage);
