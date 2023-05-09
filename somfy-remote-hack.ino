@@ -3,24 +3,24 @@
 
 void led_setup();
 void led_blink();
-extern void somfy_remote_test();
+extern void remote_test_cmd_line_help();
+extern void remote_test_cmd_line();
 
 void setup() 
 {
-  Serial.begin(115200);
-  delay(1000);
+    Serial.begin(115200);
+    delay(1000);
 
-  Serial.println("somfy-remote-hack.ino");
-  led_setup();
+    Serial.println("somfy-remote-hack.ino");
+    led_setup();
 
-  somfy_remote_test();
+    remote_test_cmd_line_help();
 }
 
 void loop() 
 {
-  led_blink();
-  
-
+    led_blink();
+    remote_test_cmd_line();
 }
 
 void led_setup()
@@ -30,10 +30,10 @@ void led_setup()
 
 void led_blink()
 {
-  delay(1000);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(1000);
-  digitalWrite(LED_BUILTIN, LOW);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);
 }
 
 void ota_server_setup()

@@ -1,72 +1,92 @@
 
 #include <Arduino.h>
+#include "somfy-conf.hpp"
 #include "somfy-remote.hpp"
 
-void get_select_test(SomfyRemote & remote)
+void remote_test_cmd_line_help()
 {
-    Serial.println("test::get_select()\n");
-    Serial.println("Press the select group button and enter the select group value (1-5).");
-    while(Serial.available() == 0) {}
-
-    int user_select_group = Serial.parseInt();
-    Serial.print("User select group : ");
-    Serial.println(user_select_group);
-
-    SomfyRemote::select_group_t select_group = remote.get_select();
-    Serial.print("Read select group : ");
-    Serial.println(select_group);
-
-    if(user_select_group == select_group)
-    {
-        Serial.println(">> PASS");
-    } 
-    else
-    {
-        Serial.println(">> FAIL");
-    }
+    Serial.println("Available commands: \n");
+    Serial.println(" up           Push release UP button");
+    Serial.println(" my           Push release MY button");
+    Serial.println(" dw           Push release DOWN button");
+    Serial.println(" sl[value]    Get/set Select Group");
 }
 
-void somfy_remote_test()
+void remote_test_cmd_line()
 {
-    SomfyRemote::button_t button_up =
-    { 
-        26,
-        LOW
-    };
-    SomfyRemote::button_t button_my = 
-    { 
-        17,
-        LOW
-    };
-    SomfyRemote::button_t button_down = 
-    { 
-        16,
-        LOW
-    };
-    SomfyRemote::button_t button_select = 
-    { 
-        27, 
-        LOW
-    };
-    SomfyRemote::button_t button_sel_monitor =
+    static const String cmds[] = 
     {
-        32,
-        LOW
+        "up", "my", "dw", "sl"
     };
 
-    SomfyRemote::button_set_t buttons = 
+    typedef enum
     {
-        button_up,
-        button_my,
-        button_down,
-        button_select,
-        button_sel_monitor
-    };
+        CMD_UP = 0U,
+        CMD_MY,
+        CMD_DOWN,
+        CMD_SEL_G,
+        CMD_INVALID = 255U
+    }cmd_t;
 
-    SomfyRemote remote(buttons);
+    while(Serial.available() == 0) {};
+    String cmd_input = Serial.readString();
 
-    get_select_test(remote);
-    get_select_test(remote);
-    get_select_test(remote);
+    uint8_t cmd_index;
+    for (cmd_index = CMD_UP ; cmd_index < 4; cmd_index++)
+    {
+        if(cmd_input.substring(0,2) == cmds[cmd_index])
+        {
+            break;
+        }
+    }
 
+    SomfyRemote::select_group_t sel_group = SomfyRemote::SELECT_GROUP_UNDEFINED;
+    bool sel_group_set = false;
+    if(cmd_index == CMD_SEL_G && cmd_input.length() == 3)
+    {
+        sel_group_set = true;
+        sel_group = (SomfyRemote::select_group_t)cmd_input.substring(2).toInt();
+        if(sel_group < SomfyRemote::SELECT_GROUP_LED1 || sel_group > SomfyRemote::SELECT_GROUP_LEDSALL)
+        {
+            cmd_index = CMD_INVALID; 
+        }
+    }
+
+    switch(cmd_index)
+    {
+        case CMD_UP:
+        Serial.println("up cmd");
+        remote.up();
+        break;
+
+        case CMD_MY:
+        Serial.println("my cmd");
+        remote.my();
+        break;
+
+        case CMD_DOWN:
+        Serial.println("down cmd");
+        remote.down();
+        break;
+
+        case CMD_SEL_G:
+        {
+            if(sel_group_set)
+            {
+                Serial.print("group select cmd : ");
+                Serial.println(sel_group);
+                remote.select(sel_group);
+            }
+            else
+            {
+                Serial.print("group select read cmd : ");
+                Serial.println(remote.get_select());
+            }
+        }
+        break;
+
+        default:
+            remote_test_cmd_line_help();
+        break;
+    }
 }

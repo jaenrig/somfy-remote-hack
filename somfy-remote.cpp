@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "somfy-remote.hpp"
+#include "somfy-conf.hpp"
 
 /**
  * @brief       Somfy remote hack extension
@@ -246,3 +247,44 @@ SomfyRemote::select_monitor_state_t SomfyRemote::get_select_monitor_state()
 
     return SELECT_MON_UNDEFINED;
 }
+
+/**
+ * @brief Pre-instantiated object   
+ */
+
+SomfyRemote::button_t button_up =
+{ 
+    UP_PIN,
+    LOW
+};
+SomfyRemote::button_t button_my = 
+{ 
+    MY_PIN,
+    LOW
+};
+SomfyRemote::button_t button_down = 
+{ 
+    DOWN_PIN,
+    LOW
+};
+SomfyRemote::button_t button_select = 
+{ 
+    SELECT_PIN, 
+    LOW
+};
+SomfyRemote::button_t button_sel_monitor =
+{
+    SELECT_MON_PIN,
+    LOW
+};
+
+SomfyRemote::button_set_t buttons = 
+{
+    button_up,
+    button_my,
+    button_down,
+    button_select,
+    button_sel_monitor
+};
+
+SomfyRemote remote(buttons);

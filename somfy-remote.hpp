@@ -66,4 +66,6 @@ class SomfyRemote
         select_monitor_state_t get_select_monitor_state();
 };
 
+extern SomfyRemote remote; /**< Pre-instantiated object */
+
 #endif /* SOMFY_REMOTE_HPP */
